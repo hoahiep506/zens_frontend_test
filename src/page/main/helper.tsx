@@ -42,12 +42,12 @@ export const useJokes = () => {
     ({ jokeId, isLike }: { jokeId?: string; isLike: boolean }) => {
       if (!jokeId) return;
       apiLikeJoke({ jokeId, isLike })
-        .then((res) => {
+        .then(() => {
           readJokeIds.current.push(jokeId);
           Cookies.set('readJokeIds', readJokeIds.current.join(' '));
           selectJoke(jokes);
         })
-        .catch((err) => {});
+        .catch((err) => alert(err));
     },
     [jokes]
   );
