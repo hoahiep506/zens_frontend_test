@@ -8,7 +8,7 @@ const MainPage = () => {
   return (
     <>
       <div className='text-white text-center font-semibold h-56 flex flex-col justify-center'>
-        <p className='text-3xl font-nunito-sans mb-[10px] tracking-wider'>
+        <p className='text-3xl font-nunito-sans mb-[10px] tracking-wider px-4'>
           A joke a day keeps the doctor away
         </p>
         <p className='text-sm font-nunito-sans'>
@@ -24,7 +24,7 @@ const MainPage = () => {
               </div>
             )}
             {isString(jokeDisplay?.content) && (
-              <p className='text-gray-dark-1 text-lg leading-6'>
+              <p className='text-gray-dark-1 text-lg leading-6 px-4 xl-px-0'>
                 {jokeDisplay?.content}
               </p>
             )}
@@ -34,7 +34,7 @@ const MainPage = () => {
               </p>
             )}
             <div className='w-3/4 border-b border-gray-light-1 mx-auto my-14'></div>
-            <div className='flex justify-center gap-8'>
+            <div className='flex justify-center gap-8 px-4 xl-px-0'>
               <Button
                 label='This is Funny!'
                 color='bg-blue-base'
