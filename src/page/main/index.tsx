@@ -1,3 +1,4 @@
+import { Img } from 'assets';
 import { Button } from 'component';
 import { isString } from 'ramda-adjunct';
 import { useJokes } from './helper';
@@ -17,12 +18,17 @@ const MainPage = () => {
       <div className='w-full bg-white flex flex-col'>
         <div className='grow'>
           <div className='w-full md:max-w-4xl xl:max-w-6xl mx-auto pt-12 px-4 pb-20'>
+            {loading && (
+              <div className='w-full'>
+                <img className='mx-auto' src={Img.loading} alt='loading' />
+              </div>
+            )}
             {isString(jokeDisplay?.content) && (
               <p className='text-gray-dark-1 text-lg leading-6'>
                 {jokeDisplay?.content}
               </p>
             )}
-            {!jokeDisplay?.id && (
+            {!jokeDisplay?.id && !loading && (
               <p className='text-gray-dark-1 text-lg text-center'>
                 That's all the jokes for today! Come back another day!
               </p>
