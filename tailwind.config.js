@@ -10,6 +10,9 @@ module.exports = {
         'gray-base': '#969696',
         'gray-dark-1': '#646464',
       },
+      fontFamily: {
+        'nunito-sans': ['nunito-sans', 'sans-serif'],
+      },
     },
   },
   plugins: [],
