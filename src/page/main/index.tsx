@@ -17,7 +17,7 @@ const MainPage = () => {
       </div>
       <div className='w-full bg-white flex flex-col'>
         <div className='grow'>
-          <div className='w-full md:max-w-4xl xl:max-w-6xl mx-auto pt-12 px-4 pb-20'>
+          <div className='w-full md:max-w-4xl xl:max-w-6xl mx-auto pt-12 pb-20'>
             {loading && (
               <div className='w-full'>
                 <img className='mx-auto' src={Img.loading} alt='loading' />
