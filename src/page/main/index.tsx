@@ -1,78 +1,89 @@
-import { Img } from 'assets';
-import { Button } from 'component';
-import { isString } from 'ramda-adjunct';
-import { useJokes } from './helper';
+import Quill from 'quill';
+import 'quill-mention';
+import 'quill/dist/quill.snow.css';
+import { useEffect, useRef, useState } from 'react';
+
+async function suggestPeople(searchTerm: string) {
+  const allPeople = [
+    {
+      id: 1,
+      value: 'Fredrik Sundqvist',
+    },
+    {
+      id: 2,
+      value: 'Patrik Sjölin',
+    },
+  ];
+  return allPeople.filter((person) => person.value.includes(searchTerm));
+}
 
 const MainPage = () => {
-  const { jokeDisplay, loading, likeJoke } = useJokes();
-  return (
-    <>
-      <div className='text-white text-center font-semibold h-56 flex flex-col justify-center'>
-        <p className='text-3xl font-nunito-sans mb-[10px] tracking-wider px-4'>
-          A joke a day keeps the doctor away
-        </p>
-        <p className='text-sm font-nunito-sans'>
-          If you joke wrong way, your teeth have to pay. (Serious)
-        </p>
-      </div>
-      <div className='w-full bg-white flex flex-col'>
-        <div className='grow'>
-          <div className='w-full md:max-w-4xl xl:max-w-6xl mx-auto pt-12 pb-20'>
-            {loading && (
-              <div className='w-full'>
-                <img className='mx-auto' src={Img.loading} alt='loading' />
-              </div>
-            )}
-            {isString(jokeDisplay?.content) && (
-              <p className='text-gray-dark-1 text-lg leading-6 px-4 xl-px-0'>
-                {jokeDisplay?.content}
-              </p>
-            )}
-            {!jokeDisplay?.id && !loading && (
-              <p className='text-gray-dark-1 text-lg text-center'>
-                That's all the jokes for today! Come back another day!
-              </p>
-            )}
-            <div className='w-3/4 border-b border-gray-light-1 mx-auto my-14'></div>
-            <div className='flex justify-center gap-8 px-4 xl-px-0'>
-              <Button
-                label='This is Funny!'
-                color='bg-blue-base'
-                onClick={() =>
-                  likeJoke({ jokeId: jokeDisplay?.id, isLike: true })
-                }
-                disabled={loading || !jokeDisplay?.id}
-              />
-              <Button
-                label='This is not Funny!'
-                onClick={() =>
-                  likeJoke({ jokeId: jokeDisplay?.id, isLike: false })
-                }
-                disabled={loading || !jokeDisplay?.id}
-              />
-            </div>
-          </div>
-        </div>
+  const quillRef = useRef(null);
+  const [editor, setEditor] = useState<Quill>();
+  useEffect(() => {
+    if (quillRef.current) {
+      const newEditor = new Quill(quillRef.current, {
+        theme: 'snow',
+        modules: {
+          mention: {
+            allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
+            mentionDenotationChars: ['@', '#'],
+            source: async function (searchTerm: string, renderList: any) {
+              const matchedPeople = await suggestPeople(searchTerm);
+              renderList(matchedPeople);
+            },
+          },
+        },
+      });
+      newEditor.keyboard.addBinding(
+        { key: 'Escape' },
+        {
+          collapsed: true,
+          format: ['code-block'],
+        },
+        () => {
+          newEditor.insertText(newEditor.getLength() - 1, '\n');
+          newEditor.format('code-block', false);
+        }
+      );
+      newEditor.keyboard.addBinding(
+        { key: 'Backspace' },
+        {
+          collapsed: true,
+          format: ['code-block'],
+        },
+        () => {
+          newEditor.format('code-block', false);
+        }
+      );
 
-        <div className='border-t grow-0 h-40'>
-          <div className='w-full md:max-w-4xl xl:max-w-6xl mx-auto py-8 px-4'>
-            <p className='text-gray-base text-sm text-center mb-4'>
-              This website is created as part of HlSolutions program. The
-              materials contained on this website are provided for general
-              <br></br>
-              information only and do not constitute any form of advice. HLS
-              assumes no responsibility for the accuracy of any particular
-              statement and <br></br> accepts no liability for any loss or
-              damage which may arise from reliance on the information contained
-              on this site.
-            </p>
-            <p className='text-gray-dark-1 text-sm text-center'>
-              Copyright 2023 Cyan Blue.
-            </p>
-          </div>
-        </div>
-      </div>
-    </>
+      newEditor.on('text-change', (delta) => {
+        const index = newEditor.getLength() - 1;
+        const one = newEditor.getContents(index - 1, 1)?.ops[0]?.insert;
+        const two = newEditor.getContents(index - 2, 1)?.ops[0]?.insert;
+        const three = newEditor.getContents(index - 3, 1)?.ops[0]?.insert;
+        const currentFormat = newEditor.getFormat();
+
+        if (
+          `${one}${two}${three}` === '```' &&
+          !currentFormat?.['code-block']
+        ) {
+          newEditor.deleteText(index - 3, 3);
+          console.log(newEditor.getLength());
+          if (newEditor.getLength() > 1) {
+            newEditor.insertText(newEditor.getLength() - 1, '\n');
+          }
+          newEditor.format('code-block', true);
+        }
+      });
+      setEditor(newEditor);
+    }
+  }, []);
+
+  return (
+    <div>
+      <div id='test' ref={quillRef}></div>
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
-import { apiGetJokes, apiLikeJoke } from 'api';
+import { apiLikeJoke } from 'api';
 import Cookies from 'js-cookie';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 export interface Joke {
   id: string;
   content: string;
@@ -22,30 +22,6 @@ export const useJokes = () => {
     );
     if (unreadJokes.length) setJokeDisplay(unreadJokes[0]);
     else setJokeDisplay(null);
-  }, []);
-
-  const getJokes = useCallback(() => {
-    setLoading(true);
-    apiGetJokes()
-      .then((res) => {
-        setLoading(false);
-        if (!res.data?.length) return;
-        setJokes(res.data);
-        selectJoke(res.data);
-      })
-      .catch((err) => {
-        const confirmed = window.confirm(
-          'Maybe server is starting up, try again?'
-        );
-        if (confirmed) return getJokes();
-        else alert(err);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!jokes.length) {
-      getJokes();
-    }
   }, []);
 
   const likeJoke = useCallback(
